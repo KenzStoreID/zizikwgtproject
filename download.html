@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Download File</title>
+</head>
+<body>
+
+<h2>Daftar File</h2>
+<ul id="list"></ul>
+
+<a href="upload.html">Ke Upload</a>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+
+<script>
+firebase.initializeApp({
+  apiKey: "AIzaSyBixOoY7TI6s2F1snJ89Rs7BBslQdM8MJs",
+  authDomain: "vps123-e25a8.firebaseapp.com",
+  projectId: "vps123-e25a8",
+  storageBucket: "vps123-e25a8.appspot.com",
+  messagingSenderId: "457851318240",
+  appId: "1:457851318240:web:436d045508429de2a10585"
+});
+
+const storage = firebase.storage();
+const listRef = storage.ref("uploads");
+
+listRef.listAll().then(res => {
+  res.items.forEach(item => {
+    item.getDownloadURL().then(url => {
+      const li = document.createElement("li");
+      li.innerHTML = `<a href="${url}" target="_blank">${item.name}</a>`;
+      document.getElementById("list").appendChild(li);
+    });
+  });
+});
+</script>
+
+</body>
+</html>
