@@ -5,47 +5,45 @@
 </head>
 <body>
 
-<h2>Upload File ke Firebase Storage</h2>
+<h2>Upload ke Firebase Storage</h2>
 
 <input type="file" id="fileInput">
-<br><br>
-<button onclick="uploadFile()">Upload</button>
+<button onclick="upload()">Upload</button>
 
 <p id="status"></p>
 
 <a href="download.html">Ke Download</a>
 
-<!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 
 <script>
-  const firebaseConfig = {
-    apiKey: "API_KEY",
-    authDomain: "PROJECT_ID.firebaseapp.com",
-    projectId: "PROJECT_ID",
-    storageBucket: "PROJECT_ID.appspot.com",
-    messagingSenderId: "SENDER_ID",
-    appId: "APP_ID"
-  };
+firebase.initializeApp({
+  apiKey: "AIzaSyBixOoY7TI6s2F1snJ89Rs7BBslQdM8MJs",
+  authDomain: "vps123-e25a8.firebaseapp.com",
+  projectId: "vps123-e25a8",
+  storageBucket: "vps123-e25a8.appspot.com",
+  messagingSenderId: "457851318240",
+  appId: "1:457851318240:web:436d045508429de2a10585"
+});
 
-  firebase.initializeApp(firebaseConfig);
-  const storage = firebase.storage();
+const storage = firebase.storage();
 
-  function uploadFile() {
-    const file = document.getElementById("fileInput").files[0];
-    if (!file) return alert("Pilih file");
+function upload() {
+  const file = document.getElementById("fileInput").files[0];
+  if (!file) return alert("Pilih file");
 
-    const ref = storage.ref("uploads/" + file.name);
-    ref.put(file)
-      .then(() => {
-        document.getElementById("status").innerText = "Upload berhasil";
-      })
-      .catch(err => {
-        document.getElementById("status").innerText = err.message;
-      });
-  }
+  const ref = storage.ref("uploads/" + file.name);
+  ref.put(file)
+    .then(() => {
+      document.getElementById("status").innerText = "Upload berhasil";
+    })
+    .catch(err => {
+      document.getElementById("status").innerText = err.message;
+    });
+}
 </script>
 
 </body>
 </html>
+
