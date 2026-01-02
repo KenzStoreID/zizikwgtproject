@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pterodactyl Client Monitoring</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-950 text-gray-100 min-h-screen">
+  <div class="max-w-6xl mx-auto p-6">
+    <h1 class="text-3xl font-bold mb-2">Pterodactyl Panel Monitor</h1>
+    <p class="text-gray-400 mb-6">Monitoring server hanya menggunakan Client API</p>
+
+    <div class="mb-6">
+      <label class="block text-sm mb-1">Panel URL</label>
+      <input id="panelUrl" placeholder="https://adlyy.xwar.my.id" class="w-full p-2 rounded bg-gray-800" />
+    </div>
+
+    <div class="mb-6">
+      <label class="block text-sm mb-1">Client API Key</label>
+      <input id="apiKey" placeholder="ptlc_v1TFw3i0v7TgUO05VYCMrrtkCkoFzPypmGh8eDy5zdC" class="w-full p-2 rounded bg-gray-800" />
+    </div>
+
+    <button onclick="loadServers()" class="bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded">Load Servers</button>
+
+    <div id="servers" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-8"></div>
+  </div>
+
+<script>
+async function apiFetch(endpoint) {
+  const panel = document.getElementById('panelUrl').value.replace(/\/$/, '')
+  const key = document.getElementById('apiKey').value
+
+  const res = await fetch(panel + endpoint, {
+    headers: {
+      'Authorization': 'Bearer ' + key,
+      'Accept': 'Application/vnd.pterodactyl.v1+json'
+    }
+  })
+
+  if (!res.ok) throw new Error('API error')
+  return res.json()
+}
+
+async function loadServers() {
+  const container = document.getElementById('servers')
+  container.innerHTML = 'Loading...'
+
+  try {
+    const data = await apiFetch('/api/client')
+    container.innerHTML = ''
+
+    for (const srv of data.data) {
+      const id = srv.attributes.identifier
+      const name = srv.attributes.name
+
+      const res = await apiFetch(`/api/client/servers/${id}/resources`)
+      const r = res.attributes
+
+      const statusColor = r.current_state === 'running' ? 'text-green-400' : 'text-red-400'
+
+      container.innerHTML += `
+        <div class="bg-gray-900 rounded p-4 shadow">
+          <h2 class="text-xl font-semibold">${name}</h2>
+          <p>Status: <span class="${statusColor}">${r.current_state}</span></p>
+          <p>CPU: ${r.resources.cpu_absolute}%</p>
+          <p>RAM: ${(r.resources.memory_bytes / 1024 / 1024).toFixed(0)} MB</p>
+          <p>Disk: ${(r.resources.disk_bytes / 1024 / 1024).toFixed(0)} MB</p>
+          <p>Network: ↑ ${(r.resources.network_tx_bytes / 1024 / 1024).toFixed(1)} MB / ↓ ${(r.resources.network_rx_bytes / 1024 / 1024).toFixed(1)} MB</p>
+        </div>
+      `
+    }
+  } catch (e) {
+    container.innerHTML = '<span class="text-red-400">Gagal mengambil data</span>'
+  }
+}
+</script>
+</body>
+</html>
